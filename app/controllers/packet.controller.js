@@ -4,7 +4,7 @@ const MongoDB = require('../utils/mongodb.util');
 
 exports.create = async (req, res, next) => {
 
-    if(!req.body?.name) {
+    if(!req.body) {
         return next(new ApiError(400, 'Name can not be empty'));
     }
 
@@ -80,26 +80,26 @@ exports.delete = async (req, res, next) => {
         const document = await packetService.delete(req.params.id);
 
         if(!document){
-            return next(new ApiError(404, 'Contact not found'));
+            return next(new ApiError(404, 'packet not found'));
         }
 
-        return res.send({message: 'Contact was deleted successfully'});
+        return res.send({message: 'packet was deleted successfully'});
 
     }catch(error){
         return next(
             500, 
-            `Could not delete contact with id=${req.params.id}`
+            `Could not delete packet with id=${req.params.id}`
         );
     }
 };
 
-exports.deleteAll = async (req, res, next) => {
+exports.deleteAll = async (_req, res, next) => {
     try{
         const packetService = new PacketService(MongoDB.client);
         const deleteCount = await packetService.deleteAll().length;
 
         return res.send({
-            message: `${deleteCount} contacts were deleted successfully`,
+            message: `${deleteCount} packets were deleted successfully`,
         })
     }catch(error){
         return next(

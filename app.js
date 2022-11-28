@@ -8,7 +8,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use('/', packetsRouter);
+app.use('/api/packets', packetsRouter);
 
 app.use((req, res, next) => {
     return next(new ApiError(404, 'Resource not found'));

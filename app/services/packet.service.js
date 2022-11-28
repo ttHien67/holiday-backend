@@ -1,4 +1,4 @@
-const {Object, ObjectId} = require('mongodb');
+const {Objects, ObjectId} = require('mongodb');
 
 class PacketService {
     constructor(client) {
@@ -9,11 +9,12 @@ class PacketService {
     // dinh nghia cac phuong thuc truy xuat CSDL su dung mongodb API
     extractContactData(payload) {
         const packet = {
-            title: payload.title,
+            img: payload.img,
             logo: payload.logo,
+            title: payload.title,
             location: payload.location,
             type: payload.type,
-            img: payload.img,
+            sale: payload.sale,
             newPrice: payload.newPrice,
             oldPrice: payload.oldPrice,
             colorBtn: payload.colorBtn,
@@ -22,18 +23,19 @@ class PacketService {
         };
 
         // remove underfined fields
-        Object.keys(packet).forEach((key) => {
-            packet[key] === undefined && delete packet[key]
-        });
+        // Object.keys(packet).forEach((key) => {
+        //     packet[key] === undefined && delete packet[key]
+        // });
 
         return packet;
     }
 
     async create(payload) {
         const packet = this.extractContactData(payload);
-        const result = await  this.Packet.findOneAndUpdate(
+        const result = await this.Packet.findOneAndUpdate(
             packet,
-            { returnDocument: 'after', upset: true}
+            { $set: this.packet = packet },
+            { returnDocument: 'after', upsert: true}
         );
 
         return result.value;
@@ -52,7 +54,7 @@ class PacketService {
 
     async findById(id) {
         return await this.Packet.findOne({
-            _id: Object.isValid(id) ? new ObjectId(id) : null,
+            _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
         });
     }
 
