@@ -1,29 +1,13 @@
 const ApiError = require("../api-error");
-const PacketService = require("../services/packet.service");
 const ContactService = require("../services/contact.service");
 const MongoDB = require('../utils/mongodb.util');
 
-exports.create = async (req, res, next) => {
-
-    if(!req.body) {
-        return next(new ApiError(400, 'Name can not be empty'));
-    }
-
-    try {
-        const packetService = new PacketService(MongoDB.client);
-        const document = await packetService.create(req.body);
-        return res.send(document);
-    }catch(error){
-        return next(new ApiError(500, 'An error occurred while creating the contact'));
-    }
-}
-
 
 // tao thong tin lien lac
-exports.createContact = async (req, res, next) => {
+exports.create = async (req, res, next) => {
 
     try {
-        const   contactService = new ContactService(MongoDB.client);
+        const contactService = new ContactService(MongoDB.client);
         const document = await contactService.create(req.body);
         return res.send(document);
     }catch(error){
@@ -31,17 +15,12 @@ exports.createContact = async (req, res, next) => {
     }
 }
 
-exports.findAll = async (req, res, next) => {
+exports.findAll = async (_req, res, next) => {
     let documents = [];
 
     try{
-        const packetService = new PacketService(MongoDB.client);
-        const { name } = req.query;
-        if(name) {
-            documents = await packetService.findByName(name);
-        }else {
-            documents = await packetService.find({});
-        }
+        const contactService = new ContactService(MongoDB.client); 
+        documents = await contactService.find({});
     }catch(error){
         return next(
             new ApiError(500, 'An error occurred while retrieving contacts')
@@ -49,22 +28,6 @@ exports.findAll = async (req, res, next) => {
     }
 
     return res.send(documents);
-};
-
-exports.findOne = async (req, res, next) => {
-    try{
-        const packetService = new PacketService(MongoDB.client);
-        const document = await packetService.findById(req.params.id);
-        if(!document){
-            return next(new ApiError(404, 'Contact not found'));
-        }
-
-        return res.send(document);
-
-    }catch(error) {
-        return next(
-            new ApiError(500, `Error retrieving contact with id=${req.params.id}`));
-    }
 };
 
 exports.update = async (req, res, next) => {

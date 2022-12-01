@@ -1,24 +1,19 @@
 const {Objects, ObjectId} = require('mongodb');
 
-class PacketService {
+class ContactService {
     constructor(client) {
-        this.Packet = client.db().collection('packages');
+        this.Contact = client.db().collection('guestinfos');
     }
 
     // dinh nghia cac phuong thuc truy xuat CSDL su dung mongodb API
     extractContactData(payload) {
-        const packet = {
-            img: payload.img,
-            logo: payload.logo,
-            title: payload.title,
-            location: payload.location,
-            type: payload.type,
-            sale: payload.sale,
-            newPrice: payload.newPrice,
-            oldPrice: payload.oldPrice,
-            colorBtn: payload.colorBtn,
-            colorIcon: payload.colorIcon,
-            description: payload.description,
+        const contact = {
+            surname: payload.surname,
+            name: payload.name,
+            email: payload.email,
+            phone: payload.phone,
+            message: payload.message,
+            packetId: payload.packetId,
         };
 
         // remove underfined fields
@@ -26,14 +21,14 @@ class PacketService {
         //     packet[key] === undefined && delete packet[key]
         // });
 
-        return packet;
+        return contact;
     }
 
     async create(payload) {
-        const packet = this.extractContactData(payload);
-        const result = await this.Packet.findOneAndUpdate(
-            packet,
-            { $set: this.packet = packet },
+        const contact = this.extractContactData(payload);
+        const result = await this.Contact.findOneAndUpdate(
+            contact,
+            { $set: this.contact = contact },
             { returnDocument: 'after', upsert: true}
         );
 
@@ -41,14 +36,8 @@ class PacketService {
     }
 
     async find(filter) {
-        const cursor = await this.Packet.find(filter);
+        const cursor = await this.Contact.find(filter);
         return await cursor.toArray();
-    }
-
-    async findByName(name) {
-        return await  this.find({
-            name: {$regex: new RegExp(name), $options: 'i'},
-        })
     }
 
     async findById(id) {
@@ -87,4 +76,4 @@ class PacketService {
 
 }
 
-module.exports = PacketService;
+module.exports = ContactService;
